@@ -1,3 +1,6 @@
+ifeq ($(CONFIG_MACH_OPLUS_SDM710),y)
+dts-dirs += 18081
+else
 dts-dirs += al
 dts-dirs += altera
 dts-dirs += amd
@@ -20,6 +23,7 @@ dts-dirs += sprd
 dts-dirs += xilinx
 dts-dirs += lg
 dts-dirs += zte
+endif
 
 subdir-y	:= $(dts-dirs)
 
