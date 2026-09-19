@@ -12,3 +12,13 @@ config MACH_OPLUS_SDM710
 	select MACH_OPLUS
 	help
 	  Support for OPlus SDM710 devices
+
+menu "OPlus board selection"
+
+config MACH_OPLUS_PBEM00
+  bool "OPPO R17 board"
+  select MACH_OPLUS_SDM710
+  help
+    Support for OPPO R17 (PBEM00)
+
+endmenu
