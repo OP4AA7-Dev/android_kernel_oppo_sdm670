@@ -37,64 +37,49 @@
 				= <3000000 2500000 2000000 1500000
 					1000000 500000>;
 
-			//for smb2:
 			qcom,usb-icl-ua = <2000000>;
 			qcom,fcc-max-ua = <2000000>;
-			//qcom,fv-max-uv = <4373000>;
 			qcom,hvdcp-disable;
-			qcom,pm660chg-vadc = <&pm660_vadc>;//chargID
-			qcom,pm660usbtemp-vadc = <&pm660_vadc>;//usb temp
-			//qcom,otg-cl-ua = <2000000>;
+			qcom,pm660chg-vadc = <&pm660_vadc>;
+			qcom,pm660usbtemp-vadc = <&pm660_vadc>;
 			qcom,float-option = <1>;
 
-			//for oppo chg framework:
 			qcom,input_current_charger_ma = <2000>;
 			qcom,input_current_usb_ma = <500>;
-
 			qcom,input_current_led_ma = <1200>;
-
 			qcom,input_current_camera_ma = <1200>;
-			//qcom,input_current_led_ma_overtemp = <900>;
 			qcom,overtemp_bat_decidegc = <350>;
 			qcom,iterm_disabled = <0>;
 			qcom,iterm_ma = <180>;
 			qcom,recharge-mv = <100>;
 			qcom,batt_capacity_mah = <3415>;
 
-			qcom,removed_bat_decidegc = <190>;  /*<-19C*/
-
-			qcom,cold_bat_decidegc = <20>;  /*-2C~0C*/
+			qcom,removed_bat_decidegc = <190>;
+			qcom,cold_bat_decidegc = <20>;
 			qcom,temp_cold_vfloat_mv = <3980>;
 			qcom,temp_cold_fastchg_current_ma = <330>;
-
-			qcom,little_cold_bat_decidegc = <0>;	/*0C~5C*/
+			qcom,little_cold_bat_decidegc = <0>;
 			qcom,temp_little_cold_vfloat_mv = <4385>;
 			qcom,temp_little_cold_fastchg_current_ma_high = <1620>;
 			qcom,temp_little_cold_fastchg_current_ma_low = <970>;
 			qcom,temp_little_cold_fastchg_current_ma = <510>;
-
-			qcom,cool_bat_decidegc = <50>;	/*5C~12C*/
+			qcom,cool_bat_decidegc = <50>;
 			qcom,temp_cool_vfloat_mv = <4385>;
 			qcom,temp_cool_fastchg_current_ma_high = <2200>;
 			qcom,temp_cool_fastchg_current_ma_low = <1620>;
-
-			qcom,little_cool_bat_decidegc = <120>;	/*12C~16C*/
+			qcom,little_cool_bat_decidegc = <120>;
 			qcom,temp_little_cool_vfloat_mv = <4385>;
 			qcom,temp_little_cool_fastchg_current_ma = <2200>;
-
-			qcom,normal_bat_decidegc = <160>;	/*16C~45C*/
+			qcom,normal_bat_decidegc = <160>;
 			qcom,temp_normal_fastchg_current_ma = <2200>;
 			qcom,temp_normal_vfloat_mv = <4385>;
-
-			qcom,warm_bat_decidegc = <480>;		/*48C~53C*/ /*8pin Bat   Vooc project need add 3 degree C*/
+			qcom,warm_bat_decidegc = <480>;
 			qcom,temp_warm_vfloat_mv = <4130>;
 			qcom,temp_warm_fastchg_current_ma = <850>;
-
 			qcom,hot_bat_decidegc = <530>;
 
 			qcom,non_standard_vfloat_mv = <3980>;
 			qcom,non_standard_fastchg_current_ma = <512>;
-
 			qcom,short_c_bat_cv_mv = <4330>;
 			qcom,short_c_bat_vfloat_mv = <3800>;
 			qcom,short_c_bat_fastchg_current_ma = <512>;
@@ -129,14 +114,12 @@
 
 			qcom,normal_vterm_hw_inc = <18>;
 			qcom,non_normal_vterm_hw_inc = <18>;
-
 			qcom,ff1_normal_fastchg_ma = <1000>;
 			qcom,ffc2_normal_fastchg_ma = <700>;/*16C~35c*/
 			qcom,ffc2_temp_warm_decidegc = <350>;
 			qcom,ffc2_warm_fastchg_ma = <800>;/*35C~40c*/
 			qcom,ffc2_temp_high_decidegc = <400>;
 			qcom,ffc2_exit_step_ma = <100>;
-
 			qcom,ffc_normal_vfloat_sw_limit = <4430>;
 			qcom,ffc_temp_normal_vfloat_mv = <4500>;
 			qcom,ffc_normal_vfloat_over_sw_limit = <4500>;
@@ -147,9 +130,6 @@
 			qcom,default_temp_normal_vfloat_mv = <4385>;
 			qcom,default_normal_vfloat_over_sw_limit = <4385>;
 			
-			///qcom,offset_temp = <30>;
-			//for control:
-			//qcom,suspend_after_full;
 			qcom,check_batt_full_by_sw;
 			qcom,external_gauge;
 			qcom,chg_ctrl_by_lcd;
@@ -159,22 +139,15 @@
 			qcom,chargerid_switch-gpio = <&tlmm 44 0x00>;
 			qcom,ship-gpio = <&tlmm 21 0x00>;
 			qcom,shortc-gpio = <&tlmm 43 0x00>;
-			////qcom,ccdetect-gpio = <&tlmm 40 0x00>;
-			//qcom,dischg-gpio = <&pm660l_gpios 7 0x00>;
 			pinctrl-names = "chargerid_switch_active", "chargerid_switch_sleep", "chargerid_switch_default", 
 							"ship_active", "ship_sleep",
 							"shortc_active";
-							/*"dischg_enable", "dischg_disable",*/
 			pinctrl-0 = <&chargerid_switch_active>;
 			pinctrl-1 = <&chargerid_switch_sleep>;
 			pinctrl-2 = <&chargerid_switch_default>;
 			pinctrl-3 = <&ship_active>;
 			pinctrl-4 = <&ship_sleep>;
 			pinctrl-5 = <&shortc_active>;
-			//pinctrl-3 = <&ccdetect_active>;
-			//pinctrl-4 = <&ccdetect_sleep>;
-			//pinctrl-3 = <&dischg_enable>;
-			//pinctrl-4 = <&dischg_disable>;
 
 		qcom,chgr@1000 {
 			reg = <0x1000 0x100>;
