@@ -2277,7 +2277,11 @@ static int msm_dai_q6_afe_enc_cfg_get(struct snd_kcontrol *kcontrol,
 		case ENC_FMT_AAC_V2:
 			memcpy(ucontrol->value.bytes.data + format_size,
 				&dai_data->enc_config.data,
+				#ifndef CONFIG_MACH_OPLUS_SDM710
+				sizeof(struct asm_aac_enc_cfg_v2_t));
+				#else
 				sizeof(struct asm_aac_enc_cfg_t));
+				#endif
 			break;
 		case ENC_FMT_APTX:
 			memcpy(ucontrol->value.bytes.data + format_size,
@@ -2335,7 +2339,11 @@ static int msm_dai_q6_afe_enc_cfg_put(struct snd_kcontrol *kcontrol,
 		case ENC_FMT_AAC_V2:
 			memcpy(&dai_data->enc_config.data,
 				ucontrol->value.bytes.data + format_size,
+				#ifndef CONFIG_MACH_OPLUS_SDM710
+				sizeof(struct asm_aac_enc_cfg_v2_t));
+				#else
 				sizeof(struct asm_aac_enc_cfg_t));
+				#endif
 			break;
 		case ENC_FMT_APTX:
 			memcpy(&dai_data->enc_config.data,

@@ -220,7 +220,11 @@ static bool msm_swap_gnd_mic(struct snd_soc_codec *codec, bool active);
 static struct wcd_mbhc_config mbhc_cfg = {
 	.read_fw_bin = false,
 	.calibration = NULL,
+	#ifndef CONFIG_MACH_OPLUS_SDM710
 	.detect_extn_cable = true,
+	#else
+	.detect_extn_cable = false,
+	#endif
 	.mono_stero_detection = false,
 	.swap_gnd_mic = NULL,
 	.hs_ext_micbias = true,
@@ -2725,6 +2729,16 @@ int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 				__func__, index, ret);
 			goto clk_off;
 		}
+
+		#ifdef CONFIG_MACH_OPLUS_SDM710
+		if (index == SEC_MI2S) {
+			ret = snd_soc_dai_set_fmt(rtd->codec_dai, fmt|SND_SOC_DAIFMT_I2S);
+			if (ret < 0) {
+				pr_warn("%s: set codec fmt fail, ret=%d \n", __func__, ret);
+			}
+		}
+		#endif
+
 		if (mi2s_intf_conf[index].msm_is_ext_mclk) {
 			mi2s_mclk[index].enable = 1;
 			pr_debug("%s: Enabling mclk, clk_freq_in_hz = %u\n",
@@ -3257,6 +3271,10 @@ static int msm_asoc_machine_probe(struct platform_device *pdev)
 	int ret = -EINVAL, id;
 	const struct of_device_id *match;
 
+	#ifdef CONFIG_MACH_OPLUS_SDM710
+	pr_info("%s: *** Enter\n", __func__);
+	#endif
+
 	pdata = devm_kzalloc(&pdev->dev,
 			     sizeof(struct msm_asoc_mach_data),
 			     GFP_KERNEL);
@@ -3381,6 +3399,15 @@ static int msm_asoc_machine_probe(struct platform_device *pdev)
 	}
 	if (pdata->snd_card_val != INT_SND_CARD)
 		msm_ext_register_audio_notifier(pdev);
+	#ifdef CONFIG_MACH_OPLUS_SDM710
+	pr_info("%s: sound card register success.\n", __func__);
+
+	if ((pdata->snd_card_val == INT_SND_CARD)) {
+		if (msm_cdc_pinctrl_select_sleep_state(pdata->dmic_gpio_p)) {
+			pr_err("%s: set dmic data pin high-z state error\n", __func__);
+		}
+	}
+	#endif
 
 	return 0;
 err:
