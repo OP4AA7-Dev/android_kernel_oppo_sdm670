@@ -149,7 +149,6 @@
 };
 
 &qupv3_se9_i2c  {
-	//Wanghao@BSP.group 2018-04-15 add for enable i2c_9
 	status = "okay";
 	synaptics17081@20 {
 		compatible = "synaptics-s3706";
@@ -161,7 +160,6 @@
 		interrupts = <125 0x00>;
 
 		/* Power Config */
-		//enable2v8_gpio = <&tlmm 15 0x1>;
 		vdd_2v8-supply = <&touchpanel_vdd>;
 		vcc_1v8-supply = <&pm660_l8>;
 
@@ -176,6 +174,10 @@
 		touchpanel,panel-coords = <1080 2340>;
 		touchpanel,display-coords = <1080 2340>;
 		touchpanel,touchmajor-limit = <0 54>;
+
+		platform_support_project = <18081 18085>;
+		platform_support_project_dir = <18081 18085>;
+		platform_support_project_commandline = "default_commandline", "default_commandline", "default_commandline";
 
 		/* SW Support Feature Control */
 		black_gesture_support;
