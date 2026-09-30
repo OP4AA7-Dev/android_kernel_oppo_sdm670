@@ -69,7 +69,7 @@
 			};
 		};
 
-		oppo_fp_common{
+		oplus_fp_common{
 			gpio_id2_default: gpio_id2_default {
 				mux {
 					pins = "gpio41";

@@ -45,7 +45,6 @@
 			qcom,kpdpwr-sw-debounce;
 			qcom,system-reset;
 			qcom,store-hard-reset-reason;
-			oppo,pmicwd;
 
 			qcom,pon_1 {
 				qcom,pon-type = <0>;

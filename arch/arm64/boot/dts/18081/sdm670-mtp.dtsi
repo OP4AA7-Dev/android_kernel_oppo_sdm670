@@ -307,27 +307,28 @@
 	        };
 	};
 
-	oppo_fp_common {
-		compatible = "oppo,fp_common"; //Manufacture, and Model
-		oppo,fp_gpio = <41>; // 0: silead,1:goodix,empty:no id pin
+	oplus_fp_common {
+		compatible = "oplus,fp_common"; //Manufacture, and Model
+		oplus,fp_gpio_num = <1>; /* the gpio number of fingerprint id used */
+		oplus,fp_gpio_0 = <&tlmm 41 0x0>; // 0: silead,1:goodix,empty:no id pin
 		pinctrl-names = "default";
 		pinctrl-0 = <&gpio_id2_default>;
 		goodix_optical {
-			oppo,fp-id = <1>; /* fp id mapping table */
+			oplus,fp-id = <1>; /* fp id mapping table */
 			vendor-chip = <11>; /* please refer to the struct fp_vendor_t in oppo_fp_commmon.n */
 			eng-menu = "-1,-1"; /* represents SNR, inclination test item in engineer menu, and 0/1 means off/on */
 			chip-name = "G_OPTICAL_G2";  /* /proc/fp_id, will be displayed in engineer menu  */
 		};
 		silead_optical {
-			oppo,fp-id = <0>; /* fp id mapping table */
+			oplus,fp-id = <0>; /* fp id mapping table */
 			vendor-chip = <13>; /* please refer to the struct fp_vendor_t in oppo_fp_commmon.n */
 			eng-menu = "-1,-1"; /* represents SNR, inclination test item in engineer menu, and 0/1 means off/on */
 			chip-name = "S_OPTICAL_70"; /* /proc/fp_id, will be displayed in engineer menu  */
 		};
 	};
 
-	oppo_secure_common {
-		compatible = "oppo,secure_common";
+	oplus_secure_common {
+		compatible = "oplus,secure_common";
 	};
 
 	goodix_fp {
@@ -345,7 +346,7 @@
 
 		power-num = <1> ;
 		power_source_1 {
-			power-mode = <1>;   /* 1 = ldo power, refer to oppo_fp_common.h*/
+			power-mode = <1>;   /* 1 = ldo power, refer to oplus_fp_common.h*/
 			power-name = "ldo";
 			power-config = "ldo-config";
 			delay-time = <0>;
@@ -368,7 +369,7 @@
 	};
 
 	devinfo {
-		compatible = "oppo-devinfo";
+		compatible = "oplus-devinfo";
 
 		qcom,devinfo-vadc = <&pm660_vadc>;
 		pinctrl-names = "default";
