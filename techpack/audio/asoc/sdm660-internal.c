@@ -1219,7 +1219,11 @@ static void *def_msm_int_wcd_mbhc_cal(void)
 		return NULL;
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm_int_wcd_cal)->X) = (Y))
+	#ifndef CONFIG_MACH_OPLUS_SDM710
 	S(v_hs_max, 1500);
+	#else /* CONFIG_MACH_OPLUS_SDM710 */
+	S(v_hs_max, 1700);
+	#endif /* CONFIG_MACH_OPLUS_SDM710 */
 #undef S
 #define S(X, Y) ((WCD_MBHC_CAL_BTN_DET_PTR(msm_int_wcd_cal)->X) = (Y))
 	S(num_btn, WCD_MBHC_DEF_BUTTONS);
@@ -1242,6 +1246,7 @@ static void *def_msm_int_wcd_mbhc_cal(void)
 	 * 210-290 == Button 2
 	 * 360-680 == Button 3
 	 */
+	#ifndef CONFIG_MACH_OPLUS_SDM710
 	btn_low[0] = 75;
 	btn_high[0] = 75;
 	btn_low[1] = 150;
@@ -1252,6 +1257,18 @@ static void *def_msm_int_wcd_mbhc_cal(void)
 	btn_high[3] = 450;
 	btn_low[4] = 500;
 	btn_high[4] = 500;
+	#else /* CONFIG_MACH_OPLUS_SDM710 */
+	btn_low[0] = 60;
+	btn_high[0] = 130;
+	btn_low[1] = 131;
+	btn_high[1] = 131;
+	btn_low[2] = 253;
+	btn_high[2] = 253;
+	btn_low[3] = 425;
+	btn_high[3] = 425;
+	btn_low[4] = 426;
+	btn_high[4] = 426;
+	#endif /* CONFIG_MACH_OPLUS_SDM710 */
 
 	return msm_int_wcd_cal;
 }
@@ -1609,6 +1626,25 @@ static int msm_snd_card_late_probe(struct snd_soc_card *card)
 	return ret;
 }
 
+#ifdef CONFIG_MACH_OPLUS_SDM710
+static int ak4376_audrx_init(struct snd_soc_pcm_runtime *rtd)
+{
+	struct snd_soc_codec *codec = rtd->codec;
+	struct snd_soc_dapm_context *dapm = snd_soc_codec_get_dapm(codec);//&codec->dapm;
+	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
+
+	pr_err("%s(),dev_name%s\n", __func__, dev_name(cpu_dai->dev));
+
+	snd_soc_dapm_ignore_suspend(dapm, "AK4376 HPL");
+	snd_soc_dapm_ignore_suspend(dapm, "AK4376 HPR");
+	snd_soc_dapm_ignore_suspend(dapm, "Playback");
+
+	snd_soc_dapm_sync(dapm);
+
+	return 0;
+}
+#endif
+
 static struct snd_soc_ops msm_tdm_be_ops = {
 	.hw_params = msm_tdm_snd_hw_params
 };
@@ -1876,6 +1912,9 @@ static struct snd_soc_dai_link msm_int_dai[] = {
 		.cpu_dai_name = "INT3_MI2S_TX_HOSTLESS",
 		.platform_name = "msm-pcm-hostless",
 		.dynamic = 1,
+		#ifdef CONFIG_MACH_OPLUS_SDM710
+		.dpcm_playback = 1,
+		#endif
 		.dpcm_capture = 1,
 		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
 			    SND_SOC_DPCM_TRIGGER_POST},
@@ -2744,6 +2783,45 @@ static struct snd_soc_dai_link msm_int_be_dai[] = {
 	},
 };
 
+#ifdef CONFIG_MACH_OPLUS_SDM710
+static struct snd_soc_dai_link ak43xx_be_dai_links[] = {
+	{
+		.name = LPASS_BE_SEC_MI2S_RX,
+		.stream_name = "Secondary MI2S Playback",
+		.cpu_dai_name = "msm-dai-q6-mi2s.1",
+		.platform_name = "msm-pcm-routing",
+		.codec_name = "ak4376.2-0010",
+		.codec_dai_name = "ak4376-AIF1",
+		.init = ak4376_audrx_init,
+		.no_pcm = 1,
+		.dpcm_playback = 1,
+		.id = MSM_BACKEND_DAI_SECONDARY_MI2S_RX,
+		.be_hw_params_fixup = msm_common_be_hw_params_fixup,
+		.ops = &msm_mi2s_be_ops,
+		.ignore_suspend = 1,
+		.ignore_pmdown_time = 1,
+	},
+};
+
+static struct snd_soc_dai_link tfa98xx_be_dai_links[] = {
+	{
+		.name = LPASS_BE_TERT_MI2S_RX,
+		.stream_name = "Tertiary MI2S Playback",
+		.cpu_dai_name = "msm-dai-q6-mi2s.2",
+		.platform_name = "msm-pcm-routing",
+		.codec_name = "tfa98xx.2-0035",
+		.codec_dai_name = "tfa98xx-aif-2-35",
+		.no_pcm = 1,
+		.dpcm_playback = 1,
+		.id = MSM_BACKEND_DAI_TERTIARY_MI2S_RX,
+		.be_hw_params_fixup = msm_common_be_hw_params_fixup,
+		.ops = &msm_mi2s_be_ops,
+		.ignore_suspend = 1,
+		.ignore_pmdown_time = 1,
+	},
+};
+#endif
+
 static struct snd_soc_dai_link msm_mi2s_be_dai_links[] = {
 	{
 		.name = LPASS_BE_PRI_MI2S_RX,
@@ -3204,6 +3282,13 @@ static struct snd_soc_card *msm_int_populate_sndcard_dailinks(
 	struct snd_soc_card *card = &sdm660_card;
 	struct snd_soc_dai_link *dailink;
 	int len1;
+	#ifdef CONFIG_MACH_OPLUS_SDM710
+	int i;
+	const char *product_name = NULL;
+	const char *oppo_speaker_type = "oppo,speaker-pa";
+	const char *oppo_headphone_type = "oppo,headphone-pa";
+	struct snd_soc_dai_link *temp_link;
+	#endif
 
 	card->name = dev_name(dev);
 	len1 = ARRAY_SIZE(msm_int_dai);
@@ -3225,6 +3310,42 @@ static struct snd_soc_card *msm_int_populate_sndcard_dailinks(
 
 	if (of_property_read_bool(dev->of_node,
 				  "qcom,mi2s-audio-intf")) {
+		#ifdef CONFIG_MACH_OPLUS_SDM710
+		if (!of_property_read_string(dev->of_node, oppo_headphone_type,
+				&product_name)) {
+			pr_info("%s: custom headphone product %s\n", __func__, product_name);
+			for (i = 0; i < ARRAY_SIZE(msm_mi2s_be_dai_links); i++) {
+				temp_link = &msm_mi2s_be_dai_links[i];
+				if (temp_link->id == MSM_BACKEND_DAI_SECONDARY_MI2S_RX) {
+					if (!strcmp(product_name, "akm")
+						&& soc_find_component(NULL, ak43xx_be_dai_links[0].codec_name)) {
+						pr_info("%s: use akm dailink replace\n", __func__);
+						memcpy(temp_link, &ak43xx_be_dai_links[0],
+							sizeof(ak43xx_be_dai_links[0]));
+						break;
+					}
+				}
+			}
+		}
+
+		if (!of_property_read_string(dev->of_node, oppo_speaker_type,
+				&product_name)) {
+			pr_info("%s: custom speaker product %s\n", __func__, product_name);
+			for (i = 0; i < ARRAY_SIZE(msm_mi2s_be_dai_links); i++) {
+				temp_link = &msm_mi2s_be_dai_links[i];
+				if (temp_link->id == MSM_BACKEND_DAI_TERTIARY_MI2S_RX) {
+					if (!strcmp(product_name, "nxp")
+						&& soc_find_component(NULL, tfa98xx_be_dai_links[0].codec_name)) {
+						pr_info("%s: use nxp dailink replace\n", __func__);
+						memcpy(temp_link, &tfa98xx_be_dai_links[0],
+							sizeof(tfa98xx_be_dai_links[0]));
+						break;
+					}
+				}
+			}
+		}
+		#endif
+
 		memcpy(dailink + len1,
 		       msm_mi2s_be_dai_links,
 		       sizeof(msm_mi2s_be_dai_links));
