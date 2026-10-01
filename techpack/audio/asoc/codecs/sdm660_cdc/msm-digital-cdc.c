@@ -56,10 +56,10 @@ static unsigned long tx_digital_gain_reg[] = {
 	MSM89XX_CDC_CORE_TX5_VOL_CTL_GAIN,
 };
 
-#ifndef CONFIG_MACH_OPLUS_SDM710
-#define SDM660_TX_UNMUTE_DELAY_MS 40
-#else
+#ifdef CONFIG_MACH_OPLUS_SDM710
 #define SDM660_TX_UNMUTE_DELAY_MS 50
+#else
+#define SDM660_TX_UNMUTE_DELAY_MS 40
 #endif
 static int tx_unmute_delay = SDM660_TX_UNMUTE_DELAY_MS;
 module_param(tx_unmute_delay, int, 0664);

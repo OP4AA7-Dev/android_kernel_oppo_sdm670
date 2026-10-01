@@ -30,12 +30,6 @@
 #define WCN_CDC_SLIM_RX_CH_MAX 2
 #define WCN_CDC_SLIM_TX_CH_MAX 3
 
-#ifdef CONFIG_MACH_OPLUS_SDM710
-static unsigned long clk_on_jiffies = 0;
-static unsigned long clk_off_jiffies = 0;
-static unsigned int clk_switch_us = 52*1000; //52ms
-#endif
-
 #define WSA8810_NAME_1 "wsa881x.20170211"
 #define WSA8810_NAME_2 "wsa881x.20170212"
 #define MSM_LL_QOS_VALUE 300 /* time in us to ensure LPM doesn't go in C3/C4 */
@@ -949,17 +943,9 @@ static int msm_dmic_event(struct snd_soc_dapm_widget *w,
 	struct msm_asoc_mach_data *pdata = NULL;
 	struct snd_soc_codec *codec = snd_soc_dapm_to_codec(w->dapm);
 	int ret = 0;
-	#ifdef CONFIG_MACH_OPLUS_SDM710
-	static bool dmic_active = false;
-	unsigned int interval_us = 0;
-	#endif
 
 	pdata = snd_soc_card_get_drvdata(codec->component.card);
-	#ifndef CONFIG_MACH_OPLUS_SDM710
 	pr_debug("%s: event = %d\n", __func__, event);
-	#else
-	pr_info("%s: event = %d\n", __func__, event);
-	#endif
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
 		ret = msm_cdc_pinctrl_select_active_state(pdata->dmic_gpio_p);
@@ -992,11 +978,7 @@ static int msm_int_mclk0_event(struct snd_soc_dapm_widget *w,
 	int ret = 0;
 
 	pdata = snd_soc_card_get_drvdata(codec->component.card);
-	#ifndef CONFIG_MACH_OPLUS_SDM710
 	pr_debug("%s: event = %d\n", __func__, event);
-	#else
-	pr_info("%s: event = %d\n", __func__, event);
-	#endif
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
 		ret = msm_cdc_pinctrl_select_active_state(pdata->pdm_gpio_p);
@@ -1215,17 +1197,9 @@ static int msm_int_mi2s_snd_startup(struct snd_pcm_substream *substream)
 static void msm_int_mi2s_snd_shutdown(struct snd_pcm_substream *substream)
 {
 	int ret;
-	#ifdef CONFIG_MACH_OPLUS_SDM710
-	unsigned int interval_us = 0;
-	#endif /* VENDOR_EDIT */
 
-	#ifndef CONFIG_MACH_OPLUS_SDM710
 	pr_debug("%s(): substream = %s  stream = %d\n", __func__,
 			substream->name, substream->stream);
-	#else
-	pr_info("%s(): substream = %s  stream = %d\n", __func__,
-			substream->name, substream->stream);
-	#endif
 
 	ret = int_mi2s_set_sclk(substream, false);
 	if (ret < 0)
@@ -1247,9 +1221,9 @@ static void *def_msm_int_wcd_mbhc_cal(void)
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm_int_wcd_cal)->X) = (Y))
 	#ifndef CONFIG_MACH_OPLUS_SDM710
 	S(v_hs_max, 1500);
-	#else
+	#else /* CONFIG_MACH_OPLUS_SDM710 */
 	S(v_hs_max, 1700);
-	#endif
+	#endif /* CONFIG_MACH_OPLUS_SDM710 */
 #undef S
 #define S(X, Y) ((WCD_MBHC_CAL_BTN_DET_PTR(msm_int_wcd_cal)->X) = (Y))
 	S(num_btn, WCD_MBHC_DEF_BUTTONS);
@@ -1283,7 +1257,7 @@ static void *def_msm_int_wcd_mbhc_cal(void)
 	btn_high[3] = 450;
 	btn_low[4] = 500;
 	btn_high[4] = 500;
-	#else
+	#else /* CONFIG_MACH_OPLUS_SDM710 */
 	btn_low[0] = 60;
 	btn_high[0] = 130;
 	btn_low[1] = 131;
@@ -1294,7 +1268,7 @@ static void *def_msm_int_wcd_mbhc_cal(void)
 	btn_high[3] = 425;
 	btn_low[4] = 426;
 	btn_high[4] = 426;
-	#endif
+	#endif /* CONFIG_MACH_OPLUS_SDM710 */
 
 	return msm_int_wcd_cal;
 }
@@ -2837,24 +2811,6 @@ static struct snd_soc_dai_link tfa98xx_be_dai_links[] = {
 		.platform_name = "msm-pcm-routing",
 		.codec_name = "tfa98xx.2-0035",
 		.codec_dai_name = "tfa98xx-aif-2-35",
-		.no_pcm = 1,
-		.dpcm_playback = 1,
-		.id = MSM_BACKEND_DAI_TERTIARY_MI2S_RX,
-		.be_hw_params_fixup = msm_common_be_hw_params_fixup,
-		.ops = &msm_mi2s_be_ops,
-		.ignore_suspend = 1,
-		.ignore_pmdown_time = 1,
-	},
-};
-
-static struct snd_soc_dai_link tfa98xx_be_dai_links_new[] = {
-	{
-		.name = LPASS_BE_TERT_MI2S_RX,
-		.stream_name = "Tertiary MI2S Playback",
-		.cpu_dai_name = "msm-dai-q6-mi2s.2",
-		.platform_name = "msm-pcm-routing",
-		.codec_name = "tfa98xx.0-0035",
-		.codec_dai_name = "tfa98xx-aif-0-35",
 		.no_pcm = 1,
 		.dpcm_playback = 1,
 		.id = MSM_BACKEND_DAI_TERTIARY_MI2S_RX,
